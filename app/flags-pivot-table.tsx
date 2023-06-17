@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-table";
 import { Transaction } from "@types";
 import { useTransaction } from "./provider";
-import { currencyFormatter } from "./utils";
+import { currencyFormatter, sortingConfig } from "./utils";
 
 const FlagsPivotTable = () => {
   const { transactions } = useTransaction();
@@ -45,13 +45,26 @@ const FlagsPivotTable = () => {
   const columns = [
     columnHelper.accessor("flag", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
 
-    columnHelper.accessor((row) => currencyFormatter.format(row.outflow), {
-      id: "outflow",
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
+    columnHelper.accessor("outflow", {
+      cell: (info) => (
+        <p className="text-right">
+          {currencyFormatter.format(info.getValue())}
+        </p>
+      ),
+      footer: ({ table }) => {
+        const total = table
+          .getFilteredRowModel()
+          .rows.reduce(
+            (total, row) => total + row.getValue<number>("outflow"),
+            0
+          );
+
+        return (
+          <p className="text-right">Total: {currencyFormatter.format(total)}</p>
+        );
+      },
     }),
   ];
 
@@ -72,13 +85,10 @@ const FlagsPivotTable = () => {
 
   return (
     <>
-      <h1 className="text-4xl font-bold mb-4">Total Outflow x Flags</h1>
+      <h2 className="text-4xl font-bold mb-4">Total Outflow x Flags</h2>
       <div className="flex-none mb-10 relative z-10  before:absolute before:top-2 before:left-2 before:w-full before:h-full before:bg-black">
         <div className="relative z-10 w-full h-full max-w-2xl max-h-96 border-2 border-black bg-white overflow-auto">
-          <table
-            className="table-auto"
-            style={{ width: table.getCenterTotalSize() }}
-          >
+          <table className="table-auto w-full">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
@@ -88,9 +98,6 @@ const FlagsPivotTable = () => {
                         key={header.id}
                         colSpan={header.colSpan}
                         className="px-4 py-1 bg-orange-500 text-white border border-black"
-                        style={{
-                          width: header.getSize(),
-                        }}
                       >
                         {header.isPlaceholder ? null : (
                           <div
@@ -105,10 +112,9 @@ const FlagsPivotTable = () => {
                               header.column.columnDef.header,
                               header.getContext()
                             )}
-                            {{
-                              asc: " 🔼",
-                              desc: " 🔽",
-                            }[header.column.getIsSorted() as string] ?? null}
+                            {sortingConfig[
+                              header.column.getIsSorted() as string
+                            ] ?? null}
                           </div>
                         )}
                       </th>
@@ -135,7 +141,10 @@ const FlagsPivotTable = () => {
               {table.getFooterGroups().map((footerGroup) => (
                 <tr key={footerGroup.id}>
                   {footerGroup.headers.map((header) => (
-                    <th key={header.id}>
+                    <th
+                      key={header.id}
+                      className="px-4 py-1 border border-black"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(

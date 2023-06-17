@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-table";
 import { Transaction } from "@types";
 import { useTransaction } from "./provider";
-import { currencyFormatter } from "./utils";
+import { currencyFormatter, sortingConfig } from "./utils";
 
 const AllTransactionsTable = () => {
   const { transactions: data } = useTransaction();
@@ -22,40 +22,34 @@ const AllTransactionsTable = () => {
   const columns = [
     columnHelper.accessor("account", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
     columnHelper.accessor("flag", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
     columnHelper.accessor("date", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
     columnHelper.accessor("payee", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
     columnHelper.accessor("categoryGroup", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
     columnHelper.accessor("category", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
     columnHelper.accessor("memo", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
-    columnHelper.accessor((row) => currencyFormatter.format(row.outflow), {
-      id: "outflow",
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
+    columnHelper.accessor("outflow", {
+      cell: (info) => (
+        <p className="text-right">
+          {currencyFormatter.format(info.getValue())}
+        </p>
+      ),
     }),
     columnHelper.accessor("cleared", {
       cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
     }),
   ];
 
@@ -76,7 +70,7 @@ const AllTransactionsTable = () => {
 
   return (
     <>
-      <h1 className="text-4xl font-bold mb-4">All Transactions</h1>
+      <h2 className="text-4xl font-bold mb-4">All Transactions</h2>
       <div className="flex-none mb-10 relative z-10  before:absolute before:top-2 before:left-2 before:w-full before:h-full before:bg-black">
         <div className="relative z-10 w-full h-full max-w-2xl max-h-96 border-2 border-black bg-white overflow-auto">
           <table
@@ -109,10 +103,9 @@ const AllTransactionsTable = () => {
                               header.column.columnDef.header,
                               header.getContext()
                             )}
-                            {{
-                              asc: " 🔼",
-                              desc: " 🔽",
-                            }[header.column.getIsSorted() as string] ?? null}
+                            {sortingConfig[
+                              header.column.getIsSorted() as string
+                            ] ?? null}
                           </div>
                         )}
                       </th>
@@ -139,7 +132,10 @@ const AllTransactionsTable = () => {
               {table.getFooterGroups().map((footerGroup) => (
                 <tr key={footerGroup.id}>
                   {footerGroup.headers.map((header) => (
-                    <th key={header.id}>
+                    <th
+                      key={header.id}
+                      className="px-4 py-1 border border-black"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(

@@ -1,11 +1,19 @@
 "use client";
 
 import { Transaction } from "@types";
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import {
+  MutableRefObject,
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 
 export const TransactionContext = createContext<{
   transactions: Transaction[];
   setTransactions: (v: Transaction[]) => void;
+  resultsRef: MutableRefObject<any>;
 } | null>(null);
 
 export const useTransaction = () => {
@@ -17,9 +25,12 @@ export const useTransaction = () => {
 };
 
 export const TransactionProvider = ({ children }: PropsWithChildren) => {
+  const resultsRef = useRef(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   return (
-    <TransactionContext.Provider value={{ transactions, setTransactions }}>
+    <TransactionContext.Provider
+      value={{ transactions, setTransactions, resultsRef }}
+    >
       {children}
     </TransactionContext.Provider>
   );

@@ -8,7 +8,7 @@ import { useTransaction } from "./provider";
 const Form = () => {
   const [file, setFile] = useState<File>();
   const { handleSubmit } = useForm();
-  const { setTransactions } = useTransaction();
+  const { setTransactions, resultsRef } = useTransaction();
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
     useDropzone({
@@ -36,6 +36,10 @@ const Form = () => {
     });
     const { transactions } = await res.json();
     setTransactions(transactions);
+
+    setTimeout(() => {
+      resultsRef?.current.scrollIntoView({ behavior: "smooth" });
+    }, 300);
   };
 
   return (
