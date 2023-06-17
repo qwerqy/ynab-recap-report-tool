@@ -9,7 +9,7 @@ const Results = () => {
   const { resultsRef } = useTransaction();
 
   return (
-    <div ref={resultsRef}>
+    <div ref={resultsRef} className="w-full">
       <AllTransactionsTable />
       <CategoriesPivotTable />
       <FlagsPivotTable />

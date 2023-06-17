@@ -87,7 +87,7 @@ const CategoriesPivotTable = () => {
     <>
       <h2 className="text-4xl font-bold mb-4">Total Outflow x Categories</h2>
       <div className="flex-none mb-10 relative z-10  before:absolute before:top-2 before:left-2 before:w-full before:h-full before:bg-black">
-        <div className="relative z-10 w-full h-full max-w-2xl max-h-96 border-2 border-black bg-white overflow-auto">
+        <div className="relative z-10 w-full h-full max-h-96 border-2 border-black bg-white overflow-auto">
           <table className="table-auto w-full">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
