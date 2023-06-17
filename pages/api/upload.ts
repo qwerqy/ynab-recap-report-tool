@@ -72,7 +72,7 @@ export default async function handler(
           categoryGroup: transaction["category group"],
           category: transaction.category,
           memo: transaction.memo,
-          outflow: transaction.outflow,
+          outflow: Number(transaction.outflow.replace(/[^0-9.-]+/g, "")),
           cleared: transaction.cleared,
         };
       });

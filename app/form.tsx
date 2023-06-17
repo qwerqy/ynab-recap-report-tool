@@ -3,19 +3,29 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDropzone } from "react-dropzone";
-import { Transaction } from "@types";
-import Table from "./table";
+import { useTransaction } from "./provider";
 
 const Form = () => {
   const [file, setFile] = useState<File>();
-  const { register, handleSubmit } = useForm();
-  const [data, setData] = useState<Transaction[]>();
+  const { handleSubmit } = useForm();
+  const { setTransactions } = useTransaction();
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (acceptedFiles) => {
-      setFile(acceptedFiles[0]);
-    },
-  });
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
+    useDropzone({
+      onDrop: (acceptedFiles) => {
+        setFile(acceptedFiles[0]);
+      },
+      maxFiles: 1,
+      accept: {
+        "text/csv": [".csv"],
+        "application/vnd.ms-excel": [],
+        "application/csv": [],
+        "text/x-csv": [],
+        "application/x-csv": [],
+        "text/comma-separated-values": [],
+        "text/x-comma-separated-values": [],
+      },
+    });
 
   const onSubmit = async () => {
     const formData = new FormData();
@@ -25,7 +35,7 @@ const Form = () => {
       body: formData,
     });
     const { transactions } = await res.json();
-    setData(transactions);
+    setTransactions(transactions);
   };
 
   return (
@@ -37,7 +47,9 @@ const Form = () => {
             className="border-2 border-neutral-500 p-10 mb-6"
           >
             <input {...getInputProps()} />
-            {isDragActive ? (
+            {acceptedFiles[0] ? (
+              <span>{acceptedFiles[0].name}</span>
+            ) : isDragActive ? (
               <p>Drop the files here ...</p>
             ) : (
               // eslint-disable-next-line react/no-unescaped-entities
@@ -45,12 +57,15 @@ const Form = () => {
             )}
           </div>
           <div className="flex justify-center items-center ">
-            <button
-              type="submit"
-              className="border-2 border-black bg-pink-500 px-8 py-2 text-white font-semibold"
-            >
-              Submit
-            </button>
+            {
+              <button
+                type="submit"
+                disabled={!acceptedFiles[0]}
+                className="border-2 border-black bg-pink-500 px-8 py-2 text-white font-semibold disabled:bg-slate-400"
+              >
+                Submit
+              </button>
+            }
           </div>
         </form>
       </div>
