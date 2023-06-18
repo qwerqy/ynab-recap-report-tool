@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Row,
   SortingState,
   createColumnHelper,
   flexRender,
@@ -11,46 +10,59 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Transaction } from "@types";
-import { useTransaction } from "./provider";
-import { currencyFormatter, sortingConfig } from "./utils";
+import { useTransaction } from "../provider";
+import { currencyFormatter, sortingConfig } from "../utils";
 import { TableWrapper } from "@components/table-wrapper";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
-const CategoriesPivotTable = () => {
-  const router = useRouter();
+const TransactionsTable = () => {
+  const params = useSearchParams();
+  const category = params?.get("category");
+  const flag = params?.get("flag");
   const { transactions } = useTransaction();
+  const [data, setData] = useState<Transaction[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [data, setData] = React.useState<
-    Pick<Transaction, "category" | "outflow">[]
-  >([]);
 
   useEffect(() => {
-    const categories = transactions.map((transaction) => transaction.category);
-    const uniqueCategories = [...new Set(categories)];
-    const newData = uniqueCategories.map((category) => {
-      const transactionsForCategory = transactions.filter(
+    if (category) {
+      const filteredTransactions = transactions.filter(
         (transaction) => transaction.category === category
       );
-      const totalOutflow = transactionsForCategory.reduce(
-        (acc, transaction) => acc + transaction.outflow,
-        0
-      );
-      return {
-        category,
-        outflow: totalOutflow,
-      };
-    });
-    setData(newData);
-  }, [transactions]);
+      setData(filteredTransactions);
+    }
 
-  const columnHelper =
-    createColumnHelper<Pick<Transaction, "category" | "outflow">>();
+    if (flag) {
+      const filteredTransactions = transactions.filter(
+        (transaction) => transaction.flag === flag
+      );
+      setData(filteredTransactions);
+    }
+  }, [params, transactions]);
+
+  const columnHelper = createColumnHelper<Transaction>();
 
   const columns = [
+    columnHelper.accessor("account", {
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("flag", {
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("date", {
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("payee", {
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("categoryGroup", {
+      cell: (info) => info.getValue(),
+    }),
     columnHelper.accessor("category", {
       cell: (info) => info.getValue(),
     }),
-
+    columnHelper.accessor("memo", {
+      cell: (info) => info.getValue(),
+    }),
     columnHelper.accessor("outflow", {
       cell: (info) => (
         <p className="text-right">
@@ -70,6 +82,9 @@ const CategoriesPivotTable = () => {
         );
       },
     }),
+    columnHelper.accessor("cleared", {
+      cell: (info) => info.getValue(),
+    }),
   ];
 
   const table = useReactTable({
@@ -87,19 +102,16 @@ const CategoriesPivotTable = () => {
     return null;
   }
 
-  const handleRowClick = (
-    row: Row<Pick<Transaction, "category" | "outflow">>
-  ) => {
-    const category: string = row.getValue("category");
-
-    router.push("/transactions?category=" + encodeURIComponent(category));
-  };
-
   return (
     <>
-      <h2 className="text-4xl font-bold mb-4">Total Outflow x Categories</h2>
-      <TableWrapper>
-        <table className="table-auto w-full">
+      <h2 className="text-4xl font-bold mb-4">
+        Transactions for <span className="underline">{category || flag}</span>
+      </h2>
+      <TableWrapper className="max-h-[80vh]">
+        <table
+          className="table-auto"
+          style={{ width: table.getCenterTotalSize() }}
+        >
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -108,7 +120,10 @@ const CategoriesPivotTable = () => {
                     <th
                       key={header.id}
                       colSpan={header.colSpan}
-                      className="px-4 py-1 bg-red-500 text-white border border-black"
+                      className="px-4 py-1 bg-purple-500 text-white border border-black"
+                      style={{
+                        width: header.getSize(),
+                      }}
                     >
                       {header.isPlaceholder ? null : (
                         <div
@@ -136,11 +151,7 @@ const CategoriesPivotTable = () => {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="hover:bg-slate-100"
-                onClick={() => handleRowClick(row)}
-              >
+              <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-4 py-1 border border-black">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -171,4 +182,4 @@ const CategoriesPivotTable = () => {
   );
 };
 
-export default CategoriesPivotTable;
+export default TransactionsTable;

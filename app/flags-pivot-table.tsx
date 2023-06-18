@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import {
+  Row,
   SortingState,
   createColumnHelper,
   flexRender,
@@ -12,8 +13,11 @@ import {
 import { Transaction } from "@types";
 import { useTransaction } from "./provider";
 import { currencyFormatter, sortingConfig } from "./utils";
+import { TableWrapper } from "@components/table-wrapper";
+import { useRouter } from "next/navigation";
 
 const FlagsPivotTable = () => {
+  const router = useRouter();
   const { transactions } = useTransaction();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [data, setData] = React.useState<
@@ -68,6 +72,12 @@ const FlagsPivotTable = () => {
     }),
   ];
 
+  const handleRowClick = (row: Row<Pick<Transaction, "flag" | "outflow">>) => {
+    const flag: string = row.getValue("flag");
+
+    router.push("/transactions?flag=" + encodeURIComponent(flag));
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -86,79 +96,75 @@ const FlagsPivotTable = () => {
   return (
     <>
       <h2 className="text-4xl font-bold mb-4">Total Outflow x Flags</h2>
-      <div className="flex-none mb-10 relative z-10  before:absolute before:top-2 before:left-2 before:w-full before:h-full before:bg-black">
-        <div className="relative z-10 w-full h-full max-h-96 border-2 border-black bg-white overflow-auto">
-          <table className="table-auto w-full">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <th
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        className="px-4 py-1 bg-orange-500 text-white border border-black"
-                      >
-                        {header.isPlaceholder ? null : (
-                          <div
-                            {...{
-                              className: header.column.getCanSort()
-                                ? "cursor-pointer select-none"
-                                : "",
-                              onClick: header.column.getToggleSortingHandler(),
-                            }}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            {sortingConfig[
-                              header.column.getIsSorted() as string
-                            ] ?? null}
-                          </div>
-                        )}
-                      </th>
-                    );
-                  })}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-1 border border-black">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              {table.getFooterGroups().map((footerGroup) => (
-                <tr key={footerGroup.id}>
-                  {footerGroup.headers.map((header) => (
+      <TableWrapper>
+        <table className="table-auto w-full">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
                     <th
                       key={header.id}
-                      className="px-4 py-1 border border-black"
+                      colSpan={header.colSpan}
+                      className="px-4 py-1 bg-orange-500 text-white border border-black"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.footer,
+                      {header.isPlaceholder ? null : (
+                        <div
+                          {...{
+                            className: header.column.getCanSort()
+                              ? "cursor-pointer select-none"
+                              : "",
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
                             header.getContext()
                           )}
+                          {sortingConfig[
+                            header.column.getIsSorted() as string
+                          ] ?? null}
+                        </div>
+                      )}
                     </th>
-                  ))}
-                </tr>
-              ))}
-            </tfoot>
-          </table>
-        </div>
-      </div>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr
+                key={row.id}
+                className="hover:bg-slate-100"
+                onClick={() => handleRowClick(row)}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="px-4 py-1 border border-black">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            {table.getFooterGroups().map((footerGroup) => (
+              <tr key={footerGroup.id}>
+                {footerGroup.headers.map((header) => (
+                  <th key={header.id} className="px-4 py-1 border border-black">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.footer,
+                          header.getContext()
+                        )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </tfoot>
+        </table>
+      </TableWrapper>
     </>
   );
 };

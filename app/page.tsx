@@ -6,7 +6,7 @@ import Results from "./results";
 export default function Home() {
   return (
     <>
-      <main className="antialiased flex w-full sm:max-w-2xl mx-auto flex-col items-center justify-between pt-24 px-8">
+      <main className="antialiased flex w-full sm:max-w-6xl mx-auto flex-col items-center justify-between pt-24 px-8">
         <div className="mb-8 text-xl text-center tracking-wide font-semibold">
           <h1 className="text-5xl font-bold tracking-normal">
             YNAB Monthly Recap Tool
