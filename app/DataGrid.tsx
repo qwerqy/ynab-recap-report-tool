@@ -108,6 +108,8 @@ export const DataGrid = () => {
     setPeriod([startDate, endDate]);
   }, [transactions]);
 
+  if (!transactions.length) return null;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 my-10">
       <DataCard bgColor={"bg-green-500"}>

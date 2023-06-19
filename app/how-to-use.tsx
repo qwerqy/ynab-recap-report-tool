@@ -1,4 +1,5 @@
 import { flags } from "@utils/consts";
+import Image from "next/image";
 
 const steps = [
   "In YNAB, go to All Accounts, set the desired View, usually I would set a month.",
@@ -12,6 +13,15 @@ const HowToUse = () => (
   <div className="mb-10 flex flex-col gap-4">
     <div>
       <h2 className="text-4xl font-bold">How to use</h2>
+      <div className="relative z-10   before:absolute before:top-2 before:left-2 before:w-full before:h-full before:bg-black">
+        <Image
+          src="/YRRT Showcase.gif"
+          width={640}
+          height={340}
+          alt={"showcase"}
+          className="mt-4 mb-10 relative z-10  w-full h-full bg-orange-200 border-2 border-black"
+        />
+      </div>
       <ol className="list-decimal text-lg font-medium">
         {steps.map((step, idx) => (
           <li key={idx}>

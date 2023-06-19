@@ -13,7 +13,7 @@ const Results = () => {
     <div ref={resultsRef} className="max-w-full">
       <DataGrid />
       <AllTransactionsTable />
-      <div className="flex gap-10">
+      <div className="flex flex-col sm:flex-row gap-10">
         <CategoriesPivotTable />
         <FlagsPivotTable />
       </div>
