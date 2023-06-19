@@ -30,16 +30,23 @@ const Form = () => {
   const onSubmit = async () => {
     const formData = new FormData();
     formData.append("file", file as File);
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-    const { transactions } = await res.json();
-    setTransactions(transactions);
 
-    setTimeout(() => {
-      resultsRef?.current.scrollIntoView({ behavior: "smooth" });
-    }, 300);
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const { transactions } = await res.json();
+      setTransactions(transactions);
+
+      if (resultsRef) {
+        setTimeout(() => {
+          resultsRef?.current.scrollIntoView();
+        }, 300);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

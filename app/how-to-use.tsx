@@ -36,7 +36,7 @@ const HowToUse = () => (
     </div>
     <div>
       <h3 className="text-3xl font-bold mb-2">Flags I use</h3>
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         {flags.map((flag, idx) => (
           <div
             key={idx}

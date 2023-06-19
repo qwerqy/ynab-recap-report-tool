@@ -1,7 +1,6 @@
 import { Transaction } from "@types";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parse } from "papaparse";
-// import { auth } from "../../lib/firebase-admin";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,7 +9,6 @@ export default async function handler(
   if (req.method === "POST") {
     // Parse CSV
     try {
-      //   const user = await auth.verifyIdToken(req.cookies.auth);
       const csv = req.body;
       const csvData = parse<string[]>(csv, {
         header: false,
@@ -19,6 +17,11 @@ export default async function handler(
         transform: (value) => {
           //   If value matches Content-, do not return
           if (value.match(/Content-/)) {
+            return;
+          }
+
+          // If value includes 'WebKitFormBoundary', do not return
+          if (value.includes("WebKitFormBoundary")) {
             return;
           }
 
@@ -57,6 +60,7 @@ export default async function handler(
         })
         .filter(Boolean);
 
+      console.log(data);
       const [keys, ...values] = data;
 
       const transactions: Transaction[] = values.map((row) => {

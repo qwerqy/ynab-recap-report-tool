@@ -65,7 +65,7 @@ const AllTransactionsTable = () => {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  if (!data.length) {
+  if (!data?.length) {
     return null;
   }
 
