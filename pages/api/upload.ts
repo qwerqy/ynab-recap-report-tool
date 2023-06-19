@@ -60,7 +60,6 @@ export default async function handler(
         })
         .filter(Boolean);
 
-      console.log(data);
       const [keys, ...values] = data;
 
       const transactions: Transaction[] = values.map((row) => {
