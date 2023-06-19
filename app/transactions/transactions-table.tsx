@@ -9,9 +9,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Transaction } from "@types";
+import { Transaction } from "@utils/types";
 import { useTransaction } from "../provider";
-import { currencyFormatter, sortingConfig } from "../utils";
+import { currencyFormatter, sortingConfig } from "../../utils/app-utils";
 import { TableWrapper } from "@components/table-wrapper";
 import { useSearchParams } from "next/navigation";
 

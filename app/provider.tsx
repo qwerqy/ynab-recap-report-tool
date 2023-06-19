@@ -1,6 +1,6 @@
 "use client";
 
-import { Transaction } from "@types";
+import { Transaction } from "@utils/types";
 import {
   MutableRefObject,
   PropsWithChildren,

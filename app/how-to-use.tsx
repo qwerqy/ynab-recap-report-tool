@@ -1,16 +1,11 @@
+import { flags } from "@utils/consts";
+
 const steps = [
   "In YNAB, go to All Accounts, set the desired View, usually I would set a month.",
   "Set each transaction with a flag.",
   "Once you've set a flag for each transaction, select all transactions.",
   "Click the title of your budget on the top left of the screen, and click export selected transactions.",
   "In the dashboard, upload the CSV file and click submit.",
-];
-
-const flags = [
-  { label: "Shouldn't have", bgColor: "bg-red-500" },
-  { label: "Nice to have", bgColor: "bg-orange-500" },
-  { label: "Need to have", bgColor: "bg-yellow-500" },
-  { label: "Essential", bgColor: "bg-green-500" },
 ];
 
 const HowToUse = () => (

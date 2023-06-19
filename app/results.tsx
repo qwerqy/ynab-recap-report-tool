@@ -1,5 +1,6 @@
 "use client";
 
+import { DataGrid } from "./DataGrid";
 import AllTransactionsTable from "./all-transactions-table";
 import CategoriesPivotTable from "./categories-pivot-table";
 import FlagsPivotTable from "./flags-pivot-table";
@@ -9,10 +10,13 @@ const Results = () => {
   const { resultsRef } = useTransaction();
 
   return (
-    <div ref={resultsRef} className="w-full">
+    <div ref={resultsRef} className="max-w-full">
+      <DataGrid />
       <AllTransactionsTable />
-      <CategoriesPivotTable />
-      <FlagsPivotTable />
+      <div className="flex gap-10">
+        <CategoriesPivotTable />
+        <FlagsPivotTable />
+      </div>
     </div>
   );
 };

@@ -10,9 +10,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Transaction } from "@types";
+import { Transaction } from "@utils/types";
 import { useTransaction } from "./provider";
-import { currencyFormatter, sortingConfig } from "./utils";
+import { currencyFormatter, sortingConfig } from "../utils/app-utils";
 import { TableWrapper } from "@components/table-wrapper";
 import { useRouter } from "next/navigation";
 
@@ -25,6 +25,8 @@ const CategoriesPivotTable = () => {
   >([]);
 
   useEffect(() => {
+    if (!transactions.length) return;
+
     const categories = transactions.map((transaction) => transaction.category);
     const uniqueCategories = [...new Set(categories)];
     const newData = uniqueCategories.map((category) => {
@@ -96,10 +98,10 @@ const CategoriesPivotTable = () => {
   };
 
   return (
-    <>
+    <div>
       <h2 className="text-4xl font-bold mb-4">Total Outflow x Categories</h2>
       <TableWrapper>
-        <table className="table-auto w-full">
+        <table className="table-auto font-medium">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -167,7 +169,7 @@ const CategoriesPivotTable = () => {
           </tfoot>
         </table>
       </TableWrapper>
-    </>
+    </div>
   );
 };
 

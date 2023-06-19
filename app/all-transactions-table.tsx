@@ -9,14 +9,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Transaction } from "@types";
+import { Transaction } from "@utils/types";
 import { useTransaction } from "./provider";
-import { currencyFormatter, sortingConfig } from "./utils";
+import { currencyFormatter, sortingConfig } from "../utils/app-utils";
 import { TableWrapper } from "@components/table-wrapper";
+import { FlagBadge } from "@components/flag-badge";
 
 const AllTransactionsTable = () => {
   const { transactions: data } = useTransaction();
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([
+    { id: "outflow", desc: true },
+  ]);
 
   const columnHelper = createColumnHelper<Transaction>();
 
@@ -25,7 +28,7 @@ const AllTransactionsTable = () => {
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor("flag", {
-      cell: (info) => info.getValue(),
+      cell: (info) => <FlagBadge flag={info.getValue()} />,
     }),
     columnHelper.accessor("date", {
       cell: (info) => info.getValue(),
@@ -74,7 +77,7 @@ const AllTransactionsTable = () => {
       <h2 className="text-4xl font-bold mb-4">All Transactions</h2>
       <TableWrapper>
         <table
-          className="table-auto"
+          className="table-auto font-medium"
           style={{ width: table.getCenterTotalSize() }}
         >
           <thead>

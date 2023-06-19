@@ -1,9 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDropzone } from "react-dropzone";
 import { useTransaction } from "./provider";
+import smoothscroll from "smoothscroll-polyfill";
+import useSWR, { mutate } from "swr";
+import { Transaction } from "@utils/types";
+
+const fetcher = async (formData: FormData) =>
+  fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  }).then((res) => res.json());
 
 const Form = () => {
   const [file, setFile] = useState<File>();
@@ -32,16 +41,18 @@ const Form = () => {
     formData.append("file", file as File);
 
     try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const { transactions } = await res.json();
-      setTransactions(transactions);
+      const data = await mutate<{ transactions: Transaction[] }>(
+        "api/upload",
+        fetcher(formData)
+      );
+
+      if (data) {
+        setTransactions(data.transactions);
+      }
 
       if (resultsRef) {
         setTimeout(() => {
-          resultsRef?.current.scrollIntoView();
+          resultsRef?.current.scrollIntoView({ behavior: "smooth" });
         }, 300);
       }
     } catch (err) {
@@ -49,17 +60,22 @@ const Form = () => {
     }
   };
 
+  useEffect(() => {
+    // Fix smooth scroll on Safari browser
+    smoothscroll.polyfill();
+  }, []);
+
   return (
-    <div className="flex-none mb-10 relative z-10 before:absolute before:top-2 before:left-2 before:w-full before:h-full before:bg-black">
+    <div className="max-w-lg w-full flex-none mb-10 relative z-10 before:absolute before:top-2 before:left-2 before:w-full before:h-full before:bg-black">
       <div className="relative z-10 w-full h-full border-2 border-black p-10 bg-white">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div
             {...getRootProps()}
-            className="border-2 border-neutral-500 p-10 mb-6"
+            className="border-2 border-neutral-500 p-10 mb-6 text-center"
           >
             <input {...getInputProps()} />
             {acceptedFiles[0] ? (
-              <span>{acceptedFiles[0].name}</span>
+              <span className="text-center">{acceptedFiles[0].name}</span>
             ) : isDragActive ? (
               <p>Drop the files here ...</p>
             ) : (

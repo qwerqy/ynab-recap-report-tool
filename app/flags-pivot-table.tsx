@@ -10,11 +10,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Transaction } from "@types";
+import { Transaction } from "@utils/types";
 import { useTransaction } from "./provider";
-import { currencyFormatter, sortingConfig } from "./utils";
+import { currencyFormatter, sortingConfig } from "../utils/app-utils";
 import { TableWrapper } from "@components/table-wrapper";
 import { useRouter } from "next/navigation";
+import { FlagBadge } from "@components/flag-badge";
 
 const FlagsPivotTable = () => {
   const router = useRouter();
@@ -25,6 +26,8 @@ const FlagsPivotTable = () => {
   >([]);
 
   useEffect(() => {
+    if (!transactions.length) return;
+
     const flags = transactions.map((transaction) => transaction.flag);
     const uniqueFlags = [...new Set(flags)];
     const newData = uniqueFlags.map((flag) => {
@@ -48,7 +51,7 @@ const FlagsPivotTable = () => {
 
   const columns = [
     columnHelper.accessor("flag", {
-      cell: (info) => info.getValue(),
+      cell: (info) => <FlagBadge flag={info.getValue()} />,
     }),
 
     columnHelper.accessor("outflow", {
@@ -94,10 +97,10 @@ const FlagsPivotTable = () => {
   }
 
   return (
-    <>
+    <div>
       <h2 className="text-4xl font-bold mb-4">Total Outflow x Flags</h2>
       <TableWrapper>
-        <table className="table-auto w-full">
+        <table className="table-auto w-full font-medium">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -140,7 +143,7 @@ const FlagsPivotTable = () => {
                 onClick={() => handleRowClick(row)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-1 border border-black">
+                  <td key={cell.id} className="px-4 py-2 border border-black">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -165,7 +168,7 @@ const FlagsPivotTable = () => {
           </tfoot>
         </table>
       </TableWrapper>
-    </>
+    </div>
   );
 };
 

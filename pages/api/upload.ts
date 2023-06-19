@@ -1,4 +1,5 @@
-import { Transaction } from "@types";
+import { Transaction } from "@utils/types";
+import { cleanCSVData, convertCSVToJSON } from "@utils/api-utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parse } from "papaparse";
 
@@ -34,51 +35,9 @@ export default async function handler(
         },
       });
 
-      const data = csvData.data
-        .map((row) => {
-          //   If row is undefined, return
-          if (!row) {
-            return;
-          }
+      const data = cleanCSVData(csvData.data);
 
-          // If row is an array of undefined, return
-          if (row.every((element) => element === undefined)) {
-            return;
-          }
-
-          // If row is an array of null, return
-          if (row.every((element) => element === null)) {
-            return;
-          }
-
-          // If row is an array of empty strings, return
-          if (row.every((element) => element === "")) {
-            return;
-          }
-
-          return row;
-        })
-        .filter(Boolean);
-
-      const [keys, ...values] = data;
-
-      const transactions: Transaction[] = values.map((row) => {
-        const transaction = keys?.reduce((object, key, index) => {
-          return { ...object, [key.toLowerCase()]: row?.[index] };
-        }, {} as any);
-
-        return {
-          account: transaction.account,
-          flag: transaction.flag,
-          date: transaction.date,
-          payee: transaction.payee,
-          categoryGroup: transaction["category group"],
-          category: transaction.category,
-          memo: transaction.memo,
-          outflow: Number(transaction.outflow.replace(/[^0-9.-]+/g, "")),
-          cleared: transaction.cleared,
-        };
-      });
+      const transactions: Transaction[] = convertCSVToJSON(data);
 
       res.status(200).json({ transactions });
     } catch (error: any) {
