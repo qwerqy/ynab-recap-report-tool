@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Darker_Grotesque } from "next/font/google";
 import { TransactionProvider } from "./provider";
+import { Analytics } from "@vercel/analytics/react";
 
 const fontFamily = Darker_Grotesque({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <TransactionProvider>
         <body className={fontFamily.className}>{children}</body>
       </TransactionProvider>
+      <Analytics />
     </html>
   );
 }
